@@ -1,7 +1,10 @@
-import React from "react";
+import React, { useContext } from "react";
+import { FavoritesContext } from "../context/FavoritesContext";
+
 
 const Card = ({ movieData, genreList }) => {
   // *************** Logic part ***************
+  const { favoritesList, setfavoritesList } = useContext(FavoritesContext);
 
   // fonction pour reformater la date : on utilise le destructuring et la méthode split. Ce qui va découper notre string en variable à chaque fois que JS rencontrera le charactère "-".
   //Ainsi notre string "2021-09-03" sera découpé en 3 variables que l'on pourra remettre dans l'ordre que l'on veux
@@ -9,7 +12,6 @@ const Card = ({ movieData, genreList }) => {
   const dateFormater = (date) => {
     let [yy, mm, dd] = date.split("-");
     return [dd, mm, yy].join("/");
-    // return `${dd}-${mm}-${yy}`;
   };
 
   const findGenre = (dataGenre, movieGenreID) => {
@@ -36,33 +38,49 @@ const Card = ({ movieData, genreList }) => {
   //   };
 
   const addStorage = () => {
-    // d'abord on test si le localStorage de l'utilisateur est vide. Si il est pas vide alors on peux ajotuer les coups de coeur (movieData.id) au local storage via un une méthode de tableau split. Sinon tu créés un tableau vide dans lequel on va mettre le 1er coup de coeur.
-    let storedData = window.localStorage.movies
-      ? // Si localstorage contient déjà quelque chose donc une string alors split la string à chaque fois qu'il y a une virgule et créé un tableau
-        window.localStorage.movies.split(",")
-      : [];
-    // on ajoute l'id à notre tableau si il n'y est pas déjà
-    if (!storedData.includes(movieData.id.toString())) {
-      storedData.push(movieData.id);
-      // on stock notre tableau mis à jour dans le local storage
-      window.localStorage.movies = storedData;
-    } else {
-      // console.log("déjà ajouté");
-    }
+    const newFAvorites = [...favoritesList]
+    if(!newFAvorites.includes(movieData.id.toString())) {
+      newFAvorites.push(movieData.id.toString())
+      setfavoritesList(newFAvorites)
+    } 
 
-    console.log(storedData);
+    // ****************** méthode localstorage****************
+    // // d'abord on test si le localStorage de l'utilisateur est vide. Si il est pas vide alors on peux ajouter les coups de coeur (movieData.id) au local storage via un une méthode de tableau split. Sinon tu créés un tableau vide dans lequel on va mettre le 1er coup de coeur.
+    // let storedData = favoritesList
+    //   ? // Si localstorage contient déjà quelque chose donc une string alors split la string à chaque fois qu'il y a une virgule et créé un tableau
+    //     window.localStorage.movies.split(",")
+    //   : [];
+    // // on ajoute l'id à notre tableau si il n'y est pas déjà
+    // if (!storedData.includes(movieData.id.toString())) {
+    //   storedData.push(movieData.id);
+    //   // on stock notre tableau mis à jour dans le local storage
+    //   window.localStorage.movies = storedData;
+    // } else {
+    //   // console.log("déjà ajouté");
+    // console.log(storedData);
+
+    // }
+
   };
 
   const deleteStorage = () => {
-    let storedData = window.localStorage.movies.split(",");
-    // là on filtre pour suprimer le film dont on à l'id
-    let newData = storedData.filter((id) => id != movieData.id);
-    window.localStorage.movies = newData;
-    // ici notre probblème c'est que quand on supprime un coup de coeur les card ne se mette pas à jour en live en se supprimant. 
-    // Parce qu'en fait on aurait du non pas utiliser le localstorage pour stocker les favoris mais un un state que l'on aurait utilisé en props accessible partout dans notre app avec Apicontext ou Redux. 
-    // Comme on a pas utiliser une de ces méthodes et un state notre page coup de coeur ne se met pas à jour on doit faire un truc dégeulasse qui est de recharger la page à courante à chauqe fois avec un reload !
-    window.location.reload()
-    console.log(newData);
+    console.log(movieData.id.toString());
+    // const deletedMoviesArray = favoritesList.filter(item => item != movieData.id.toString() )
+    const deletedMoviesArray = favoritesList.filter(item => item !== movieData.id.toString() )
+    
+    setfavoritesList(deletedMoviesArray)
+
+
+
+    // let storedData = window.localStorage.movies.split(",");
+    // // là on filtre pour suprimer le film dont on à l'id
+    // let newData = storedData.filter((id) => id != movieData.id);
+    // window.localStorage.movies = newData;
+    // // ici notre probblème c'est que quand on supprime un coup de coeur les card ne se mette pas à jour en live en se supprimant.
+    // // Parce qu'en fait on aurait du non pas utiliser le localstorage pour stocker les favoris mais un un state que l'on aurait utilisé en props accessible partout dans notre app avec Apicontext ou Redux.
+    // // Comme on a pas utiliser une de ces méthodes et un state notre page coup de coeur ne se met pas à jour on doit faire un truc dégeulasse qui est de recharger la page à courante à chauqe fois avec un reload !
+    // window.location.reload();
+    // console.log(newData);
   };
 
   // ***************Screen part ***************
@@ -120,4 +138,3 @@ const Card = ({ movieData, genreList }) => {
 };
 
 export default Card;
-
